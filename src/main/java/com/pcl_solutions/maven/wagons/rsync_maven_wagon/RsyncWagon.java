@@ -24,7 +24,6 @@ class RsyncWagon implements Wagon {
 
   public RsyncWagon()
   {
-    System.out.println("Creating RsyncWagon");
     sessionListeners = new Vector<SessionListener>();
     transferListeners = new Vector<TransferListener>();
   }
@@ -41,7 +40,6 @@ class RsyncWagon implements Wagon {
 
   public void connect(Repository source)
   {
-    System.out.println("Connection to repository "+source);
     repository = source;
   }
 
@@ -135,24 +133,13 @@ class RsyncWagon implements Wagon {
   public void put(File source, String destination)
   {
     try {
-      System.out.println("put "+source.getCanonicalPath()+" to "+destination);
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-  }
-
-  public void putDirectory(File sourceDirectory, String destinationDirectory)
-  {
-    try {
-      String sourceArg = sourceDirectory.getCanonicalPath();
+      String sourceArg = source.getCanonicalPath();
       URI uri = new URI(getURL(repository));
-      //String destArg = repository.getHost()+" >> "+uri.getAuthority()+" >> "+uri.getPath()+" >> "+destinationDirectory;
-      String destArg = getURL(repository);
+      String destArg = getURL(repository)+destination;
       String[] args = {
-        /*"echo", */"rsync", "-avc", "--progress", sourceArg, destArg
+        "rsync", "--progress", sourceArg, destArg
       };
 
-      System.out.println("putDirectory "+sourceArg+" to "+destArg);
       Process process = Runtime.getRuntime().exec(args);
       BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
       BufferedReader processErrors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -163,7 +150,31 @@ class RsyncWagon implements Wagon {
           System.out.println(line);
       } while (line != null);
       process.waitFor();
-      
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+  }
+
+  public void putDirectory(File sourceDirectory, String destinationDirectory)
+  {
+    try {
+      String sourceArg = sourceDirectory.getCanonicalPath();
+      URI uri = new URI(getURL(repository));
+      String destArg = getURL(repository)+destinationDirectory;
+      String[] args = {
+        "rsync", "-avc", "--progress", sourceArg, destArg
+      };
+
+      Process process = Runtime.getRuntime().exec(args);
+      BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      BufferedReader processErrors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+      String line;
+      do {
+        line = processOutput.readLine();
+        if (line != null)
+          System.out.println(line);
+      } while (line != null);
+      process.waitFor();
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -208,7 +219,6 @@ class RsyncWagon implements Wagon {
     {
       return url.substring( protocol.length() );
     }
-    // No mapping trigger? then just return as-is.
     return url;
   }
 }
