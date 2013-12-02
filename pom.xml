@@ -23,6 +23,15 @@
   <name>Maven Rsync Wagon</name>
   <inceptionYear>2013</inceptionYear>
   <description>This project is an implementation of an rsync wagon provider, using external rsync</description>
+  <scm>
+    <connection>scm:git:https://github.com/PhilLello/rsync-maven-wagon.git</connection>
+    <developerConnection>scm:git:https://github.com/PhilLello/rsync-maven-wagon.git</developerConnection>
+  </scm>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <build>
     <plugins>
       <plugin>
@@ -34,6 +43,19 @@
           <target>1.5</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -43,4 +65,8 @@
       <version>2.2</version>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <site>
+    </site>
+  </distributionManagement>
 </project>
