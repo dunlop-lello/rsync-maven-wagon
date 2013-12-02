@@ -21,12 +21,44 @@
   <artifactId>rsync-maven-wagon</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Maven Rsync Wagon</name>
+  <organization>
+    <name>PCL Solutions</name>
+    <url>http://www.pcl-solutions.com</url>
+  </organization>
   <inceptionYear>2013</inceptionYear>
   <description>This project is an implementation of an rsync wagon provider, using external rsync</description>
+  <url>http://www.pcl-solutions.com/maven/${project.name}</url>
+  <developers>
+    <developer>
+      <id>phil.lello</id>
+      <name>Phil Lello</name>
+      <organization>PCL Solutions</organization>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
   <scm>
+    <url>https://github.com/PhilLello/rsync-maven-wagon</url>
     <connection>scm:git:https://github.com/PhilLello/rsync-maven-wagon.git</connection>
     <developerConnection>scm:git:https://github.com/PhilLello/rsync-maven-wagon.git</developerConnection>
   </scm>
+  <issueManagement>
+    <system>GitHub issue tracker</system>
+    <url>https://github.com/PhilLello/rsync-maven-wagon/issues</url>
+  </issueManagement>
+  <mailingLists>
+    <mailingList>
+      <name>Rsync Maven Wagon Users List</name>
+      <subscribe>rsync-maven-wagon-users-subscribe@pcl-solutions.com</subscribe>
+      <unsubscribe>rsync-maven-wagon-users-unsubscribe@pcl-solutions.com</unsubscribe>
+      <post>rsync-maven-wagon-users@pcl-solutions.com</post>
+      <archive>http://pcl-solutions.com/pipermail/rsync-maven-wagon-users_pcl-solutions.com/</archive>
+      <otherArchives>
+        <otherArchive>http://base.google.com/base/1/127.0.0.1</otherArchive>
+      </otherArchives>
+    </mailingList>
+  </mailingLists>
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -46,6 +78,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.4</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -56,17 +89,24 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.3</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-ftp</artifactId>
+            <version>2.5</version>
+          </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-provider-api</artifactId>
-      <version>2.2</version>
-    </dependency>
-  </dependencies>
   <distributionManagement>
     <site>
+      <id>pcl-solutions.com</id>
+      <url>ftp://ftp.pcl-solutions.com/public_html/maven/${project.name}/${project.version}</url>
     </site>
   </distributionManagement>
 </project>
