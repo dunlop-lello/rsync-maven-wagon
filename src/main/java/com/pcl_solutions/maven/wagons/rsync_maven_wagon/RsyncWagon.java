@@ -19,7 +19,7 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.proxy.ProxyInfoProvider;
 import org.apache.maven.wagon.repository.Repository;
 
-class RsyncWagon implements Wagon {
+public class RsyncWagon implements Wagon {
   private List<SessionListener> sessionListeners;
   private List<TransferListener> transferListeners;
   private Repository repository;
