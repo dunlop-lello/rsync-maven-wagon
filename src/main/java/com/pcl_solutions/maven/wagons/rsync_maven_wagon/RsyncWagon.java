@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.lang.Process;
 import java.lang.Runtime;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import org.apache.maven.wagon.Wagon;
@@ -75,7 +77,10 @@ class RsyncWagon implements Wagon {
   public void get(String resourceName, File destination)
   {
     try {
-      System.out.println("get "+resourceName+" to "+destination.getCanonicalPath());
+      runRsync(
+        getURL(repository)+File.separator+resourceName,
+        destination.getCanonicalPath(),
+        Arrays.asList("-aR", "--dirs", "--progress"));
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -133,23 +138,10 @@ class RsyncWagon implements Wagon {
   public void put(File source, String destination)
   {
     try {
-      String sourceArg = source.getCanonicalPath();
-      URI uri = new URI(getURL(repository));
-      String destArg = getURL(repository)+destination;
-      String[] args = {
-        "rsync", "--progress", sourceArg, destArg
-      };
-
-      Process process = Runtime.getRuntime().exec(args);
-      BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-      BufferedReader processErrors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-      String line;
-      do {
-        line = processOutput.readLine();
-        if (line != null)
-          System.out.println(line);
-      } while (line != null);
-      process.waitFor();
+      runRsync(
+        source.getCanonicalPath(),
+        getURL(repository)+File.separator+destination,
+        Arrays.asList("-aR", "--dirs", "--progress"));
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -158,23 +150,10 @@ class RsyncWagon implements Wagon {
   public void putDirectory(File sourceDirectory, String destinationDirectory)
   {
     try {
-      String sourceArg = sourceDirectory.getCanonicalPath();
-      URI uri = new URI(getURL(repository));
-      String destArg = getURL(repository)+destinationDirectory;
-      String[] args = {
-        "rsync", "-avc", "--progress", sourceArg, destArg
-      };
-
-      Process process = Runtime.getRuntime().exec(args);
-      BufferedReader processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-      BufferedReader processErrors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-      String line;
-      do {
-        line = processOutput.readLine();
-        if (line != null)
-          System.out.println(line);
-      } while (line != null);
-      process.waitFor();
+      runRsync(
+        sourceDirectory.getCanonicalPath(),
+        getURL(repository)+File.separator+destinationDirectory,
+        Arrays.asList("--rsync-path=\"mkdir -p "+getURL(repository)+"\" && rsync", "-avc", "--progress"));
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -210,7 +189,7 @@ class RsyncWagon implements Wagon {
     return true;
   }
 
-  public String getURL(Repository repository)
+  private String getURL(Repository repository)
   {
     String url = repository.getUrl();
     String protocol = "rsync:";
@@ -220,5 +199,30 @@ class RsyncWagon implements Wagon {
       return url.substring( protocol.length() );
     }
     return url;
+  }
+
+  private void runRsync(String source, String destination, List<String> options) throws Exception
+  {
+    ArrayList<String> argv = new ArrayList<String>(options);
+    String line;
+    Process process;
+    BufferedReader processOutput, processErrors;
+    argv.add(0, "rsync");
+    argv.add(source);
+    argv.add(destination);
+    process = Runtime.getRuntime().exec(argv.toArray(new String[0]));
+    processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    processErrors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+    do {
+      line = processOutput.readLine();
+      if (line != null)
+        System.out.println(line);
+    } while (line != null);
+    do {
+      line = processErrors.readLine();
+      if (line != null)
+        System.out.println(line);
+    } while (line != null);
+    process.waitFor();
   }
 }
