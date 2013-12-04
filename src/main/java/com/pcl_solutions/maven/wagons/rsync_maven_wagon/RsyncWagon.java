@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.SessionListener;
@@ -23,6 +25,12 @@ public class RsyncWagon implements Wagon {
   private List<SessionListener> sessionListeners;
   private List<TransferListener> transferListeners;
   private Repository repository;
+  private AuthenticationInfo authenticationInfo;
+  private ProxyInfo proxyInfo;
+  private ProxyInfoProvider proxyInfoProvider;
+  private String protocol;
+  private String host;
+  private String path;
 
   public RsyncWagon()
   {
@@ -40,34 +48,34 @@ public class RsyncWagon implements Wagon {
     transferListeners.add(listener);
   }
 
-  public void connect(Repository source)
+  public void connect(Repository repository)
   {
-    repository = source;
+    setRepository(repository);
   }
 
-  public void connect(Repository source, ProxyInfo proxyInfo)
+  public void connect(Repository repository, ProxyInfo proxyInfo)
   {
-    connect(source);
+    setRepository(repository);
   }
 
-  public void connect(Repository source, ProxyInfoProvider proxyInfoProvider)
+  public void connect(Repository repository, ProxyInfoProvider proxyInfoProvider)
   {
-    connect(source);
+    setRepository(repository);
   }
 
-  public void connect(Repository source, AuthenticationInfo authenticationInfo)
+  public void connect(Repository repository, AuthenticationInfo authenticationInfo)
   {
-    connect(source);
+    setRepository(repository);
   }
 
-  public void connect(Repository source, AuthenticationInfo authenticationInfo, ProxyInfo proxyInfo)
+  public void connect(Repository repository, AuthenticationInfo authenticationInfo, ProxyInfo proxyInfo)
   {
-    connect(source);
+    setRepository(repository);
   }
 
-  public void connect(Repository source, AuthenticationInfo authenticationInfo, ProxyInfoProvider proxyInfoProvider)
+  public void connect(Repository repository, AuthenticationInfo authenticationInfo, ProxyInfoProvider proxyInfoProvider)
   {
-    connect(source);
+    setRepository(repository);
   }
 
   public void disconnect()
@@ -78,7 +86,7 @@ public class RsyncWagon implements Wagon {
   {
     try {
       runRsync(
-        getURL(repository)+File.separator+resourceName,
+        host+":"+path+File.separator+resourceName,
         destination.getCanonicalPath(),
         Arrays.asList("-aR", "--dirs", "--progress"));
     } catch (Exception e) {
@@ -140,7 +148,7 @@ public class RsyncWagon implements Wagon {
     try {
       runRsync(
         source.getCanonicalPath(),
-        getURL(repository)+File.separator+destination,
+        host+":"+path+File.separator+destination,
         Arrays.asList("-aR", "--dirs", "--progress"));
     } catch (Exception e) {
       System.out.println(e);
@@ -150,10 +158,13 @@ public class RsyncWagon implements Wagon {
   public void putDirectory(File sourceDirectory, String destinationDirectory)
   {
     try {
+      File remotePath = new File("target/rsync/"+path);
+      remotePath.mkdirs();
+      runRsync("target/rsync/", host+":/", Arrays.asList("-rd", "--progress"));
       runRsync(
-        sourceDirectory.getCanonicalPath(),
-        getURL(repository)+File.separator+destinationDirectory,
-        Arrays.asList("--rsync-path=\"mkdir -p "+getURL(repository)+"\" && rsync", "-avc", "--progress"));
+        sourceDirectory.getCanonicalPath()+"/",
+        host+":"+path+File.separator+destinationDirectory,
+        Arrays.asList("-avc", "--progress"));
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -189,16 +200,24 @@ public class RsyncWagon implements Wagon {
     return true;
   }
 
-  private String getURL(Repository repository)
+  private void setRepository(Repository repository)
   {
-    String url = repository.getUrl();
-    String protocol = "rsync:";
+    this.repository = repository;
 
-    if ( url.startsWith(protocol) )
-    {
-      return url.substring( protocol.length() );
+    String url = repository.getUrl();
+    Pattern p = Pattern.compile("([^:]*):(([^/:]*):|)(.*)");
+    Matcher m = p.matcher(url);
+    if (!m.matches()) {
+      System.err.println("Error: Couldn't decode url '"+url+"'");
+    } else {
+      protocol = m.group(1);
+      host = m.group(3);
+      path = m.group(4);
+      System.out.println("Decoded url '"+url+"' to:");
+      System.out.println(" Protocol '"+protocol+"'");
+      System.out.println(" Host '"+host+"'");
+      System.out.println(" Path '"+path+"'");
     }
-    return url;
   }
 
   private void runRsync(String source, String destination, List<String> options) throws Exception
