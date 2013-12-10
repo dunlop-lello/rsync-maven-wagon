@@ -1,0 +1,36 @@
+Usage
+
+  In pom.xml:
+
++-----+
+<project>
+  ...
+  <build>
+    ...
+    <extensions>
+      ...
+      <extension>
+        <groupId>com.pcl-solutions.maven.wagons</groupId>
+        <artifactId>rsync-maven-wagon</artifactId>
+        <version>${project.version}</version>
+      </extension>
+      ...
+    </extensions>
+    ...
+  </build>
+  ...
+  <distributionManagement>
+    ...
+    <site>
+      <id>pcl-solutions.com</id>
+      <url>rsync:<hostname>:/<absolute-path></url>
+    </site>
+    ...
+  </distributionManagement>
+  ...
+</project>
++-----+
+
+  Credentials are taken from the ssh settings for the current user, use ssh-copy-id to skip password prompt.
+
+  This version doesn't support rsync modules or relative paths.

@@ -1,0 +1,31 @@
+Getting Started
+
++-----+
+<project>
+  ...
+  <build>
+    ...
+    <extensions>
+      ...
+      <extension>
+        <groupId>com.pcl-solutions.maven.wagons</groupId>
+        <artifactId>rsync-maven-wagon</artifactId>
+        <version>${project.version}</version>
+      </extension>
+      ...
+    </extensions>
+    ...
+  </build>
+  ...
+  <distributionManagement>
+    ...
+    <site>
+      <id>pcl-solutions.com</id>
+      <url>rsync:<hostname>:/<absolute-path></url>
+    </site>
+    ...
+  </distributionManagement>
+  ...
+</project>
++-----+
+
