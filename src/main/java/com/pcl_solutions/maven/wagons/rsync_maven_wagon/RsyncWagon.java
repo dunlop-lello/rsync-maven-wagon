@@ -232,24 +232,16 @@ public class RsyncWagon implements Wagon {
     process = Runtime.getRuntime().exec(argv.toArray(new String[0]));
     processOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
     processErrors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-    boolean processAlive = true;
     do {
-      while (processOutput.ready()) {
-        line = processOutput.readLine();
-        if (line != null) getLog().info(line);
-      }
-      while (processErrors.ready()) {
-        line = processErrors.readLine();
-        if (line != null) getLog().error(line);
-      }
-      try {
-        process.exitValue();
-        processAlive = false;
-      } catch (IllegalThreadStateException e) {
-      }
-    } while (processAlive);
+      line = processOutput.readLine();
+      if (line != null)
+        System.out.println(line);
+    } while (line != null);
+    do {
+      line = processErrors.readLine();
+      if (line != null)
+        System.out.println(line);
+    } while (line != null);
     process.waitFor();
-    } catch (Exception e) {
-      getLog().error(e);
-    }
+  }
 }
