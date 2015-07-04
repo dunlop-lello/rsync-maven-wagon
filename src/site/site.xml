@@ -12,5 +12,10 @@
     </menu>
 
     <menu ref="reports"/>
+    <breadcrumbs>
+        <item name="Dunlop-Lello Consulting" href="https://consult.dunlop-lello.uk"/>
+        <item name="Community" href="https://consult.dunlop-lello.uk/community"/>
+        <item name="Maven Plugins" href="https://consult.dunlop-lello.uk/community/maven"/>
+    </breadcrumbs>
   </body>
 </project>

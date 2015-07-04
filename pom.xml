@@ -5,12 +5,12 @@
   <version>1.1-SNAPSHOT</version>
   <name>Maven Rsync Wagon</name>
   <organization>
-    <name>PCL Solutions</name>
-    <url>http://www.pcl-solutions.com</url>
+    <name>Dunlop-Lello Consulting LTD</name>
+    <url>https://consult.dunlop-lello.uk</url>
   </organization>
   <inceptionYear>2013</inceptionYear>
   <description>This project is an implementation of an rsync wagon provider, using external rsync</description>
-  <url>http://www.pcl-solutions.com/maven/${project.artifactId}</url>
+  <url>https://consult.dunlop-lello.uk/projects/maven/${project.artifactId}</url>
   <licenses>
     <license>
       <name>GNU General Public License, version 3 (GPL-3.0)</name>
@@ -22,7 +22,7 @@
     <developer>
       <id>phil.lello</id>
       <name>Phil Lello</name>
-      <organization>PCL Solutions</organization>
+      <organization>Dunlop-Lello Consulting LTD</organization>
       <roles>
         <role>developer</role>
       </roles>
@@ -40,10 +40,8 @@
   <mailingLists>
     <mailingList>
       <name>Rsync Maven Wagon Users List</name>
-      <subscribe>rsync-maven-wagon-users-subscribe@pcl-solutions.com</subscribe>
-      <unsubscribe>rsync-maven-wagon-users-unsubscribe@pcl-solutions.com</unsubscribe>
-      <post>rsync-maven-wagon-users@pcl-solutions.com</post>
-      <archive>http://pcl-solutions.com/pipermail/rsync-maven-wagon-users_pcl-solutions.com/</archive>
+      <post>maven-rsync-wagon@dunlop-lello.uk</post>
+      <archive>https://groups.google.com/a/dunlop-lello.uk/d/forum/maven-rsync-wagon</archive>
     </mailingList>
   </mailingLists>
   <parent>
@@ -79,7 +77,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.4</version>
+        <configuration>
+            <templateFile>${basedir}/src/site/site.vm</templateFile>
+        </configuration>
         <dependencies>
           <dependency>
             <groupId>org.apache.maven.wagon</groupId>
