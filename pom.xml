@@ -3,14 +3,14 @@
   <groupId>com.pcl-solutions.maven.wagons</groupId>
   <artifactId>rsync-maven-wagon</artifactId>
   <version>1.1-SNAPSHOT</version>
-  <name>Maven Rsync Wagon</name>
+  <name>Rsync Maven Wagon</name>
   <organization>
     <name>Dunlop-Lello Consulting LTD</name>
     <url>https://consult.dunlop-lello.uk</url>
   </organization>
   <inceptionYear>2013</inceptionYear>
-  <description>This project is an implementation of an rsync wagon provider, using external rsync</description>
-  <url>https://consult.dunlop-lello.uk/projects/maven/${project.artifactId}</url>
+  <description>This project is an implementation of an rsync wagon provider, using external rsync.</description>
+  <url>https://consult.dunlop-lello.uk/community/maven/${project.artifactId}</url>
   <licenses>
     <license>
       <name>GNU General Public License, version 3 (GPL-3.0)</name>
@@ -79,22 +79,19 @@
         <artifactId>maven-site-plugin</artifactId>
         <version>3.4</version>
         <configuration>
-            <templateFile>${basedir}/src/site/site.vm</templateFile>
+            <!--<templateFile>${basedir}/src/site/site.vm</templateFile>-->
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-ftp</artifactId>
-            <version>2.5</version>
-          </dependency>
-        </dependencies>
         <executions>
           <execution>
+            <phase>post-site</phase>
             <goals>
-              <goal>site</goal>
-              <goal>deploy</goal>
+              <goal>stage</goal>
             </goals>
-            <phase>deploy</phase>
+            <configuration>
+              <skipDeploy>true</skipDeploy>
+              <content>${project.build.directory}/site</content>
+              <scmBranch>gh-pages</scmBranch>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -112,6 +109,20 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-publish-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <id>scm-publish</id>
+            <phase>site-deploy</phase>
+            <goals>
+              <goal>publish-scm</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <executions>
@@ -120,6 +131,28 @@
             <goals>
               <goal>jar</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.7</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>site</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>${basedir}/target/site</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}</directory>
+                  <include>pom.xml</include>
+                </resource>
+              </resources>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -138,6 +171,12 @@
       <artifactId>wagon-provider-api</artifactId>
       <version>2.2</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-scm-publish-plugin</artifactId>
+      <version>1.1</version>
+      <type>maven-plugin</type>
+    </dependency>
   </dependencies>
   <reporting>
     <plugins>
@@ -150,8 +189,8 @@
   </reporting>
   <distributionManagement>
     <site>
-      <id>pcl-solutions.com</id>
-      <url>rsync:www.pcl-solutions.com:/home/pclsolut/public_html/maven/${project.artifactId}/${project.version}</url>
+      <id>phillello-github</id>
+      <url>scm:git:https://github.com/PhilLello/rsync-maven-wagon</url>
     </site>
   </distributionManagement>
 </project>
